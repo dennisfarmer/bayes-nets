@@ -1,0 +1,5 @@
+files/
+training_data/
+progress_frames/
+.venv/
+__pycache__/

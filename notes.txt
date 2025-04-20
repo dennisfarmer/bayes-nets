@@ -1,0 +1,374 @@
+sudo docker run gcastle/castleboard:1.0.1.211110.beta
+
+# Next steps:
+Determine what the weights in the generated graph represent:
+                z = np.random.normal(scale=scale, size=n)
+                x = X @ w + z
+
+# List of Things to Prepare / Look Into
+- check out the GUI and see if it is a potential tool to aid our workflow, and if it can work alongside code that we write
+- get a handle of the different algorithm categories by running them on the real world datasets included in gCastle
+- create a write-up in a google doc detailing what gCastle is capable of
+- be able to compare PC, GES, and Notears/GOLEM (including explainability)
+
+# Notes on above
+There is a Docker image with the GUI
+A demo of the GUI is available at https://www.youtube.com/watch?v=5NOu2oApBgw
+GUI Docker image link: https://hub.docker.com/r/gcastle/castleboard-cpu-torch
+"CastleBoard: A web gui for causal structure learning based on gCastle
+
+install docker
+docker pull gcastle/castleboard-cpu-torch:1.0.1.211112.beta
+
+.npz files store causal graphs
+there is an option to view true positive, false positive, false negative edges of a predicted causal graph compared to the true graphh
+
+rubikon
+
+
+# Graph Generation
+
+Acyclic Orientation of an undirected graph: an assignment of
+a direction to each edge (orientation) that does not form
+any directed cycle. Transforms any undirected graph into a
+directed acyclic graph
+
+Acyclic orientations of complete graphs are called transitive
+tournaments. Every transitive tournament is bipolar, meaning
+there is one source and one sink
+
+
+
+# Erdos-Renyi
+Erdos-Renyi: random graph generation model
+        n = n_nodes
+        creation_prob = (2 * n_edges) / (n_nodes ** 2)
+
+In the G(n,p) model, a graph is constructed by connecting labeled nodes randomly. Each edge is included in the graph with probability p p, independently from every other edge. Equivalently, the probability for generating each graph that has n n nodes and M M edges is p^{M}(1-p)^{{n \choose 2}-M}
+
+The parameter p in this model can be thought of as a weighting function; as p increases from 0 to 1, the model becomes more and more likely to include graphs with more edges and less and less likely to include graphs with fewer edges. In particular, the case p = 1/2 corresponds to the case where all 2^\binom{n}{2} graphs on n vertices are chosen with equal probability.
+
+The expected number of edges in G(n, p) is \binom{n}{2}p and by the law of large numbers and graph in G(n,p) will almost surely have approximately this many edges. As n increases, G(n,p) should behave similarly to G(n,M) with M=\binom{n}{2}p
+
+
+# Scale-Free
+true_dag = DAG.scale_free(n_nodes=10, n_edges=15, seed=18)
+        # m = int(round(n_edges / n_nodes))
+        # G_und = nx.barabasi_albert_graph(n=n_nodes, m=m)
+
+Barabasi-Albert model
+uses growth along with a preferential attachment mechanismo; 
+the more connected a node is, the more likely it is to receive new links. Originally developed to approximate networks 
+such as pages on the internet and social networks
+
+constant clustering coeffient as a function of the degree 
+of the node. Barabasi-Albert predicts a decreasing average
+clustering coeffiecient as the number of nodes increases
+
+a few select nodes (hubs) have unusually high degree 
+compared to other nodes of the network
+
+scale-free networks have power-law (scale-free) degree distributions
+
+
+
+# Bipartite
+
+Generates a bipartite graph: consists of two independent sets
+of nodes where every edge connects a node from one set to a node from the other set.
+
+        Can't seem to find this paper
+        # Bipartite, Sec 4.1 of (Gu, Fu, Zhou, 2018)
+
+- ER
+- scare-free
+- low-rank
+
+# Hierarchical network model
+part of the scale-free model family (proportionally more hubs among
+nodes compared to random generation), differs from Barabasi-Albert
+in that nodes with more links are expected to have a lower
+clustering coefficient
+
+no relationship between size of network and average clustering
+coefficient
+
+Clustering coefficient: measure of the degree to which nodes in a 
+graph tend to cluster together
+local: quantifies how close a specific node's neighbors are to being
+a complete graph (clique)
+
+Global clustering coefficient: the number of closed triplets (3 triangle) over the total number of triplets. 
+
+Triplets are either open (connected by two edges) or closed 
+(connected by three edges)
+
+
+    def hierarchical(n_nodes, degree=5, graph_level=5, weight_range=None, seed=None):
+
+
+    def low_rank(n_nodes, degree=1, rank=5, weight_range=None, seed=None):
+
+
+
+https://towardsdatascience.com/beyond-the-basics-level-up-your-causal-discovery-skills-in-python-now-2023-cabe0b938715
+
+
+
+method: linear  # linear, nonlinear
+n: 2000
+noise_scale: 1.0
+sem_type: gauss  
+    # LINEAR: gauss, exp, gumbel, uniform, (continuous)
+                logistic (binary)
+    # NONLINEAR: quadratic, mlp (multilayer perceptron), mim (multiple index model, Zheng et al., 2020), gp, gp-add
+    gp: gaussian_process
+
+linear Gaussian structural equation model
+        Simulate samples from linear SEM with specified type of noise.
+        For uniform, noise z ~ uniform(-a, a), where a = noise_scale.
+
+
+In the G(n, M) model, a graph is chosen uniformly at random from the collection of all graphs which have n n nodes and M edges. The nodes are considered to be labeled, meaning that graphs obtained from each other by permuting the vertices are considered to be distinct. For example, in the G(3, 2) model, there are three two-edge graphs on three labeled vertices (one for each choice of the middle vertex in a two-edge path), and each of these three graphs is included with probability 1/3.
+
+# gCastle: gradient-based causal structure learning
+- dataset generation from either simulator or real-world datasets
+- causal structure learning
+- evaluation of learned graphs
+- prior knowledge insertion
+- preliminary neighborhood selection to eliminate non-edges
+- post-processing to remove false discoveries
+
+The three provided real-world datasets each contain observational records collected from devices in real telecommunication networks and a true causal graph labeled by business experts
+
+There is also a GUI to ease the causal structure learning process and to visualize the learned graph that allows further manual annotations
+
+gCastle serves to aid the creation of an end-to-end pipeline to ease causal discovery tasks that includes:
+- simulating causal data
+- learning causal graphs with state-of-the-art algorithms like recent gradient-based algorithms
+- evaluating estimated causal graphs with common metrics such as false discovery rate (FDR), true positive rate (TPR), and structural Hamming distance (SHD)
+- using a user-friendly web interface to visualize the whole procedure
+
+## List of algorithms
+- constraint-based:
+    original-PC (Kalisch and Bühlmann, 2007), stable-PC (Colombo and Maathuis, 2014), parallel-PC (Le et al., 2016)
+- function-based
+    Direct-LiNGAM (Shimizu et al., 2011), ICA-LiNGAM (Shimizu et al., 2006), ANM (Hoyer et al., 2009), HPCI (Zhang et al., 2020)
+- score-based
+    GES (Chickering, 2002), TTPM (Cai et al., 2021)
+- gradient-based
+    GraN-DAG (Lachapelle et al., 2020), NOTEARS (Zheng et al., 2018), NOTEARS-MLP (Zheng et al., 2020), NOTEARS-SOB (Zheng et al., 2020), NOTEARS-LOW-RANK (Fang et al., 2020), NOTEARS-GOLEM (Ng et al., 2020), MCSL (Ng et al., 2019a), GAE (Ng et al., 2019b), RL-BIC (Zhu et al., 2020), CORL (Wang et al., 2021)
+
+# Other stuff:
+Causal Mechanisms (?)
+- iid_linear
+- iid_nonlinear
+- event
+Causal Functions:
+- Linear
+- MLP
+- Quadratic
+- ...
+Noise Distribution Types:
+- Gaussian
+- Exponential
+- Uniform
+- Gumbel
+- ...
+Different DAG generation strategies
+- ER
+- scare-free
+- low-rank
+- ...
+
+
+
+## Model Evaluation (estimated causal graph relative to underlying truth; performance indicators)
+Common Metrics:
+- FDR
+- TPR
+- FPR
+- SHD
+- NNZ
+- DFR (? does this exist)
+- precision
+- recall
+- F1 (= 2(precision*recall)/(precision + recall) )
+
+Metrics for specific purposes
+Example: gScore, which comes from a root cause analysis scenari in AIOps
+
+
+
+# Structural Causal Models
+https://www.youtube.com/watch?v=dQeRqb0N6gs
+
+regular equation: the equals sign does not convey any causal information
+```julia
+B=A means the same thing as A=B
+```
+
+Structural equation for A as a cause of B:
+```julia
+B is a deterministic function of a
+B := f(A)
+```
+
+We can also have:
+```julia
+B := f(A,U)
+```
+where U is any randomness that we need to represent some stochastic mapping from A to B
+This U allows structural equations to generalize the conditional distributions for causal mechanisms
+
+Represented graphically:
+
+|A|   ;U;
+  \   /
+   v v
+    B
+
+U is a dotted circle, which denotes that U is unobserved
+
+Causal Mechanism for X_i
+X_i := f(A, B, ...)
+A, B, ... are Direct causes of X_i (directly used to generate X_i)
+
+Structural causal models (SCMs) are collections of structural equations
+example:
+
+    B := f_B(A, U_B)
+M:  C := f_C(A, B, U_C)
+    D := f_D(A, C, U_D)
+
+Represented graphically:
+|A| -> B,C,D
+|B| -> C
+|C| -> D
+|D|
+;U_B; -> B
+;U_C; -> C
+;U_D; -> D
+
+B, C, and D are known as Endogenous variables
+These variables are endogenous to the model; we are modeling their causal mechanisms. The remaining variables (A, U_B, U_C, U_D) are known as exogenous variables; we aren't actually modeling how they're caused. Exogenous variables in the graph don't have any parents
+
+SCM Definition
+A tuple of the following sets:
+1. A set of endogenous variables
+2. A set of exogenous variables
+3. A set of functions, one to generate
+    each endogenous variable as a function
+    of the other variables
+
+
+# Interventions and Modularity in SCMs
+
+SCM (model):
+   T := f_T(X, U_t)
+M: Y := f_Y(X, T, U_Y)
+
+Interventional SCM (submodel):
+     T := t
+M_t: Y := F_Y(X, Y, U_Y)
+
+Modularity assumption for SCMs:
+Consider an SCM M and an interventional SCM M_t that we get by performing
+the intervention do(T=t). The modularity assumption states that M and M_t
+share all of their structural equations except the structural equation for
+T, which is T := t in M_t
+
+
+## Causal Discovery Workflow
+                                                          
+                                               Estimated Causal Graph (g')
+                                                          |
+                                                          v
+Start -> Causal Data Generation -> Causal Graph Learning -> Evaluation
+               L----------------------------------------------^
+                               True Causal Graph (g)
+
+gCastle:
+- Causal Data Generation: Real-world Dataset, Data Simulator
+- Causal Graph Learning: Algorithm Library
+- Evaluation: Causality Metrics
+
+## Synthetic/Simulated Data Simuation Procedure
+Causal Structure: g
+X1->X2->X4
+ ^      ^
+  \    /
+    X3
+
+[ Causal Structure + (Causal Function Forms, Noise Distribution Types) ] -> SCM
+Then, sample to create the Causal Dataset
+
+    
+```julia
+// SCM: Structured Causal Model
+X1 := f1(X3, N1)
+X2 := f2(X1, N2)
+X3 := f3(N3)
+X4 :- f4(X2, X3, N4)
+// N1, N2, N3, N4 are jointly independent noises
+```
+1. Given the number of variables and edges, randomly generate a DAG
+2. Set the form of causal functions and noise types to construct the SCM.
+3. Sample noises, and generate the observation data based on the SCM.
+
+--------
+Summary:
+--------
+
+synthetic observational dataset
+    = random DAG + causal function forms + noise distribution + predefined sample size
+
+
+
+
+
+
+gradient-based causal discovery methods with optional GPU acceleration
+
+
+# Constraint-based
+relies on conditional independence tests and identifies a class of Markov equivalent DAGs
+Examples:
+- PC (Sprites at al. 2000)
+
+# Function-based
+can distinguish between different DAGs in the same equivalence class by imposing additional assumptions on data distributions and/or function classes.
+
+Examples:
+- linear non-Gaussian additive model (LiNGAM, Shimizu et al. 2006, 2011)
+- Nonlinear additive noise model (ANM, Hoyer et al. 2009)
+
+# Score-based
+Evaluates candidate causal graphs with relation to the data using a score function and then searches for a causal DAG (or a class of causal DAGs) achieving the optimal score (Chickering, 2002; Peters et al. 2017)
+
+Most score-based methods use local heuristics to perform the search, due to the combinatorial nature of the acyclicity constraint.
+
+Recently, a class of methods has considered differentiable score function in combination with a novel smooth characterization of acyclicity (Zheng et al. 2018), so that (a) gradient-based optimization method is feasible to seek the desired DAG. This change of perspective allows using dep learning techniques for flexible modeling of causal mechanisms and improved scalability.
+See Yu et al. (2019); Ng et al. (2019a b, 2020); Lachapelle et al. (2020); Zheng et al. (2020); Brouillard et al. (2020); Bhattacharya et al. (2021), which have show state-of-the-art performance in may experimental settings, with both linear and nonlinear causal mechanisms.
+
+# Gradient-based
+OO
+
+```graphviz
+digraph finite_state_machine {
+    rankdir=LR;
+    size="8,5"
+
+    node [shape = doublecircle]; S;
+    node [shape = point ]; qi
+
+    node [shape = circle];
+    qi -> S;
+    S  -> q1 [ label = "a" ];
+    S  -> S  [ label = "a" ];
+    q1 -> S  [ label = "a" ];
+    q1 -> q2 [ label = "ddb" ];
+    q2 -> q1 [ label = "b" ];
+    q2 -> q2 [ label = "b" ];
+}
+```
