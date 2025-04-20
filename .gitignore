@@ -3,3 +3,4 @@ training_data/
 progress_frames/
 .venv/
 __pycache__/
+.DS_Store
