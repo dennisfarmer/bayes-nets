@@ -14,7 +14,7 @@ import numpy as np
 from string import ascii_uppercase as letters
 from time import time
 #from pgrim.discovery import *
-from functions import *
+from causal_discovery_functions import *
 
 
 def training_example():
