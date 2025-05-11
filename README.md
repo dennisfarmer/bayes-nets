@@ -14,7 +14,7 @@ The format of the evidence plays a essential role in the methods used to adapt o
 
 The general idea of learning causal world models from an evidence stream (of some format) also has an application in the creation of effective AI agents:
 
-Why Don't AI Agents Work? - Mutual Information: [link](https://www.youtube.com/watch?v=kpOWmwA6tJc)
+Why Don't AI Agents Work? - by video creator and ML consultant *Mutual Information*: [link](https://www.youtube.com/watch?v=kpOWmwA6tJc)
 
 Robust agents learn causal world models: [paper](https://arxiv.org/abs/2402.10877)
 
